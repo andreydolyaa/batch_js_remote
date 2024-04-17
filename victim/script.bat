@@ -1,5 +1,7 @@
 @echo off
 
+:: TBD
+
 set "TEMP_PATH=C:\Temp"
 set "RAW_FILE=script"
 set "READY_FILE=script.js"

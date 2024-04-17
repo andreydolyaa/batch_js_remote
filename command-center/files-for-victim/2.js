@@ -1,1 +1,1 @@
-function j() {}
+console.log("executed")

